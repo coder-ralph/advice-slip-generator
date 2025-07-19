@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Lightbulb, Download, Share2, Palette, Type, RefreshCw, Heart, Settings } from "lucide-react"
+import { Download, Share2, Palette, Type, RefreshCw, ALargeSmall, Quote } from "lucide-react"
 import html2canvas from "html2canvas"
 import { Slider } from "@/components/ui/slider"
+import { toast, Toaster } from "sonner"
 
 interface AdviceResponse {
   slip: {
@@ -17,160 +18,178 @@ interface AdviceResponse {
   }
 }
 
-// Gradient Color
+// Gradient Color with explicit CSS gradients and fallback colors
 const decorativeGradients = [
   {
     id: "sunset",
     name: "Golden Sunset",
-    gradient: "from-orange-400 via-red-500 to-pink-500",
-    textColor: "text-white",
+    gradient: "linear-gradient(135deg, #fb923c 0%, #ef4444 50%, #ec4899 100%)",
+    fallbackColors: ["#fb923c", "#ef4444", "#ec4899"],
+    textColor: "#ffffff",
     category: "decorative",
   },
   {
     id: "ocean",
     name: "Ocean Breeze",
-    gradient: "from-blue-400 via-cyan-500 to-teal-500",
-    textColor: "text-white",
+    gradient: "linear-gradient(135deg, #60a5fa 0%, #06b6d4 50%, #14b8a6 100%)",
+    fallbackColors: ["#60a5fa", "#06b6d4", "#14b8a6"],
+    textColor: "#ffffff",
     category: "decorative",
   },
   {
     id: "forest",
     name: "Forest Zen",
-    gradient: "from-green-400 via-emerald-500 to-teal-500",
-    textColor: "text-white",
+    gradient: "linear-gradient(135deg, #4ade80 0%, #10b981 50%, #14b8a6 100%)",
+    fallbackColors: ["#4ade80", "#10b981", "#14b8a6"],
+    textColor: "#ffffff",
     category: "decorative",
   },
   {
     id: "cosmic",
     name: "Cosmic Wonder",
-    gradient: "from-indigo-900 via-purple-900 to-pink-900",
-    textColor: "text-white",
+    gradient: "linear-gradient(135deg, #312e81 0%, #581c87 50%, #831843 100%)",
+    fallbackColors: ["#312e81", "#581c87", "#831843"],
+    textColor: "#ffffff",
     category: "decorative",
   },
   {
     id: "spring",
     name: "Spring Bloom",
-    gradient: "from-pink-300 via-purple-300 to-indigo-300",
-    textColor: "text-gray-800",
+    gradient: "linear-gradient(135deg, #f9a8d4 0%, #c084fc 50%, #a5b4fc 100%)",
+    fallbackColors: ["#f9a8d4", "#c084fc", "#a5b4fc"],
+    textColor: "#1f2937",
     category: "decorative",
   },
   {
     id: "aurora",
     name: "Aurora Borealis",
-    gradient: "from-green-300 via-blue-500 to-purple-600",
-    textColor: "text-white",
+    gradient: "linear-gradient(135deg, #86efac 0%, #3b82f6 50%, #9333ea 100%)",
+    fallbackColors: ["#86efac", "#3b82f6", "#9333ea"],
+    textColor: "#ffffff",
     category: "decorative",
   },
 ]
 
-// Solid Color
+// Solid Color with explicit colors
 const solidBackgrounds = [
   {
     id: "white",
     name: "Pure White",
-    gradient: "from-white to-white",
-    textColor: "text-gray-800",
+    gradient: "#ffffff",
+    fallbackColors: ["#ffffff"],
+    textColor: "#1f2937",
     category: "solid",
   },
   {
     id: "black",
     name: "Deep Black",
-    gradient: "from-gray-900 to-gray-900",
-    textColor: "text-white",
+    gradient: "#111827",
+    fallbackColors: ["#111827"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "navy",
     name: "Navy Blue",
-    gradient: "from-blue-900 to-blue-900",
-    textColor: "text-white",
+    gradient: "#1e3a8a",
+    fallbackColors: ["#1e3a8a"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "emerald",
     name: "Emerald Green",
-    gradient: "from-emerald-600 to-emerald-600",
-    textColor: "text-white",
+    gradient: "#059669",
+    fallbackColors: ["#059669"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "rose",
     name: "Rose Pink",
-    gradient: "from-rose-500 to-rose-500",
-    textColor: "text-white",
+    gradient: "#f43f5e",
+    fallbackColors: ["#f43f5e"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "amber",
     name: "Warm Amber",
-    gradient: "from-amber-500 to-amber-500",
-    textColor: "text-white",
+    gradient: "#f59e0b",
+    fallbackColors: ["#f59e0b"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "purple",
     name: "Royal Purple",
-    gradient: "from-purple-600 to-purple-600",
-    textColor: "text-white",
+    gradient: "#9333ea",
+    fallbackColors: ["#9333ea"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "indigo",
     name: "Deep Indigo",
-    gradient: "from-indigo-700 to-indigo-700",
-    textColor: "text-white",
+    gradient: "#4338ca",
+    fallbackColors: ["#4338ca"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "teal",
     name: "Ocean Teal",
-    gradient: "from-teal-600 to-teal-600",
-    textColor: "text-white",
+    gradient: "#0d9488",
+    fallbackColors: ["#0d9488"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "slate",
     name: "Modern Slate",
-    gradient: "from-slate-700 to-slate-700",
-    textColor: "text-white",
+    gradient: "#374151",
+    fallbackColors: ["#374151"],
+    textColor: "#ffffff",
     category: "solid",
   },
   {
     id: "cream",
     name: "Warm Cream",
-    gradient: "from-amber-50 to-amber-50",
-    textColor: "text-gray-800",
+    gradient: "#fef3c7",
+    fallbackColors: ["#fef3c7"],
+    textColor: "#1f2937",
     category: "solid",
   },
   {
     id: "mint",
     name: "Fresh Mint",
-    gradient: "from-green-100 to-green-100",
-    textColor: "text-gray-800",
+    gradient: "#dcfce7",
+    fallbackColors: ["#dcfce7"],
+    textColor: "#1f2937",
     category: "solid",
   },
 ]
 
 // Font Styles
 const fontStyles = [
-  { id: "serif", name: "Classic Serif", class: "font-serif", example: "Elegant & Traditional" },
-  { id: "sans", name: "Modern Sans", class: "font-sans", example: "Clean & Contemporary" },
-  { id: "mono", name: "Typewriter", class: "font-mono", example: "Retro & Technical" },
-  { id: "courgette", name: "Courgette Cursive", class: "font-courgette", example: "Charming & Playful" },
+  { id: "serif", name: "Classic Serif", fontFamily: "serif", example: "Elegant & Traditional" },
+  { id: "sans", name: "Modern Sans", fontFamily: "system-ui, sans-serif", example: "Clean & Contemporary" },
+  { id: "mono", name: "Typewriter", fontFamily: "monospace", example: "Retro & Technical" },
+  { id: "cursive", name: "Cursive", fontFamily: "cursive", example: "Charming & Playful" },
 ]
 
-// Text Color
+// Text Color with explicit colors
 const colorSchemes = [
-  { id: "white", name: "Pure White", class: "text-white", bg: "bg-white" },
-  { id: "black", name: "Deep Black", class: "text-black", bg: "bg-black" },
-  { id: "gold", name: "Golden", class: "text-yellow-300", bg: "bg-yellow-300" },
-  { id: "silver", name: "Silver", class: "text-gray-300", bg: "bg-gray-300" },
-  { id: "rose", name: "Rose Gold", class: "text-rose-300", bg: "bg-rose-300" },
-  { id: "emerald", name: "Emerald", class: "text-emerald-300", bg: "bg-emerald-300" },
-  { id: "cyan", name: "Cyan Blue", class: "text-cyan-300", bg: "bg-cyan-300" },
-  { id: "purple", name: "Purple", class: "text-purple-300", bg: "bg-purple-300" },
-  { id: "orange", name: "Orange", class: "text-orange-300", bg: "bg-orange-300" },
-  { id: "pink", name: "Hot Pink", class: "text-pink-300", bg: "bg-pink-300" },
+  { id: "white", name: "Pure White", color: "#ffffff", bg: "#ffffff" },
+  { id: "black", name: "Deep Black", color: "#000000", bg: "#000000" },
+  { id: "gold", name: "Golden", color: "#fde047", bg: "#fde047" },
+  { id: "silver", name: "Silver", color: "#d1d5db", bg: "#d1d5db" },
+  { id: "rose", name: "Rose Gold", color: "#fda4af", bg: "#fda4af" },
+  { id: "emerald", name: "Emerald", color: "#6ee7b7", bg: "#6ee7b7" },
+  { id: "cyan", name: "Cyan Blue", color: "#67e8f9", bg: "#67e8f9" },
+  { id: "purple", name: "Purple", color: "#c4b5fd", bg: "#c4b5fd" },
+  { id: "orange", name: "Orange", color: "#fdba74", bg: "#fdba74" },
+  { id: "pink", name: "Hot Pink", color: "#f9a8d4", bg: "#f9a8d4" },
 ]
 
 // Advice Backup
@@ -202,11 +221,9 @@ export default function AdviceSlipGenerator() {
       const response = await fetch("https://api.adviceslip.com/advice", {
         cache: "no-cache",
       })
-
       if (!response.ok) {
         throw new Error("Failed to fetch advice")
       }
-
       const data: AdviceResponse = await response.json()
       setCurrentAdvice(data.slip.advice)
     } catch (error) {
@@ -219,28 +236,178 @@ export default function AdviceSlipGenerator() {
     }
   }
 
-  // Generate Image
+  // Generate Image with proper gradient matching
   const generateImage = async () => {
-    if (!cardRef.current) return
+    if (!cardRef.current) {
+      toast.error("Unable to find the card to capture. Please try again.")
+      return
+    }
 
     setIsGenerating(true)
+
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 1,
+      // Wait for any animations to settle
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const element = cardRef.current
+
+      // Create a clean clone for download without quote icons
+      const clone = element.cloneNode(true) as HTMLElement
+
+      // Remove quote icons from clone
+      const quoteIconsInClone = clone.querySelector(".quote-icons-preview")
+      if (quoteIconsInClone) {
+        quoteIconsInClone.remove()
+      }
+
+      // Show branding in clone
+      const brandingInClone = clone.querySelector(".branding-download-only")
+      if (brandingInClone) {
+        ;(brandingInClone as HTMLElement).style.display = "block"
+      }
+
+      // Temporarily add clone to document for capture
+      clone.style.position = "absolute"
+      clone.style.left = "-9999px"
+      clone.style.top = "0"
+      clone.style.zIndex = "-1000"
+      document.body.appendChild(clone)
+
+      console.log("Capturing clean element without quote icons...")
+
+      const canvas = await html2canvas(clone, {
+        scale: 2,
         backgroundColor: null,
+        logging: false,
+        width: clone.offsetWidth,
+        height: clone.offsetHeight,
         useCORS: true,
         allowTaint: true,
-        width: 932,
-        height: 400,
       })
+
+      // Remove clone from document
+      document.body.removeChild(clone)
+
+      console.log("Canvas created successfully")
+
+      // Create and trigger download
+      const dataURL = canvas.toDataURL("image/png", 1.0)
+
+      if (dataURL === "data:," || dataURL.length < 100) {
+        throw new Error("Generated image is empty")
+      }
 
       const link = document.createElement("a")
       link.download = `advice-slip-${Date.now()}.png`
-      link.href = canvas.toDataURL("image/png")
+      link.href = dataURL
+
+      // Trigger download
+      document.body.appendChild(link)
       link.click()
+      document.body.removeChild(link)
+
+      toast.success("Your advice slip has been downloaded successfully! 🎉")
     } catch (error) {
       console.error("Error generating image:", error)
-      alert("Sorry, there was an error generating your image. Please try again!")
+
+      // Fallback: Create a manual canvas with exact gradient matching (NO quote icons)
+      try {
+        console.log("Creating manual canvas with exact gradients...")
+
+        const canvas = document.createElement("canvas")
+        canvas.width = 932
+        canvas.height = 400
+        const ctx = canvas.getContext("2d")!
+
+        // Draw background with exact gradient matching
+        if (selectedBackground.gradient.includes("linear-gradient") && selectedBackground.fallbackColors) {
+          // Create exact gradient
+          const gradient = ctx.createLinearGradient(0, 0, 932, 400)
+          const colors = selectedBackground.fallbackColors
+
+          if (colors.length === 3) {
+            gradient.addColorStop(0, colors[0])
+            gradient.addColorStop(0.5, colors[1])
+            gradient.addColorStop(1, colors[2])
+          } else if (colors.length === 2) {
+            gradient.addColorStop(0, colors[0])
+            gradient.addColorStop(1, colors[1])
+          } else {
+            gradient.addColorStop(0, colors[0])
+            gradient.addColorStop(1, colors[0])
+          }
+
+          ctx.fillStyle = gradient
+        } else {
+          ctx.fillStyle = selectedBackground.gradient
+        }
+        ctx.fillRect(0, 0, 932, 400)
+
+        // Draw border
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"
+        ctx.lineWidth = 2
+        ctx.strokeRect(24, 24, 884, 352)
+
+        // DO NOT draw quote icons in manual canvas
+
+        // Draw text with correct color
+        ctx.fillStyle = selectedColor.color
+        ctx.font = `${Math.max(textSize * 0.6, 16)}px ${selectedFont.fontFamily}`
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+
+        // Add text shadow effect
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)"
+        ctx.shadowBlur = 4
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
+
+        // Simple text wrapping
+        const words = currentAdvice.split(" ")
+        const lines = []
+        let currentLine = ""
+
+        for (const word of words) {
+          const testLine = currentLine + word + " "
+          const metrics = ctx.measureText(testLine)
+          if (metrics.width > 600 && currentLine !== "") {
+            lines.push(currentLine.trim())
+            currentLine = word + " "
+          } else {
+            currentLine = testLine
+          }
+        }
+        lines.push(currentLine.trim())
+
+        // Draw lines with quotes
+        const lineHeight = Math.max(textSize * 0.6, 16) * 1.4
+        const startY = 200 - (lines.length * lineHeight) / 2
+
+        lines.forEach((line, index) => {
+          const text = index === 0 ? `"${line}` : index === lines.length - 1 ? `${line}"` : line
+          ctx.fillText(text, 466, startY + index * lineHeight)
+        })
+
+        // Draw branding in bottom-right corner
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)"
+        ctx.font = "12px system-ui"
+        ctx.textAlign = "right"
+        ctx.fillText("Advice Slip Generator", 908, 384)
+
+        const dataURL = canvas.toDataURL("image/png")
+        const link = document.createElement("a")
+        link.download = `advice-slip-${Date.now()}.png`
+        link.href = dataURL
+
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        toast.success("Your advice slip has been downloaded! 🎉")
+      } catch (fallbackError) {
+        console.error("Manual canvas failed:", fallbackError)
+        toast.error("Unable to generate image. Please try refreshing the page and using a different browser.")
+      }
     } finally {
       setIsGenerating(false)
     }
@@ -248,9 +415,7 @@ export default function AdviceSlipGenerator() {
 
   // Share to Threads
   const shareToThreads = () => {
-    const text = encodeURIComponent(
-      `Daily Wisdom:\n\n"${currentAdvice}"\n\n#adviceoftheday #wisdom #dailymotivation`
-    )
+    const text = encodeURIComponent(`Daily Wisdom:\n\n"${currentAdvice}"\n\n#adviceoftheday #wisdom #dailymotivation`)
     const threadsUrl = `https://www.threads.net/intent/post?text=${text}`
     window.open(threadsUrl, "_blank")
   }
@@ -274,50 +439,120 @@ export default function AdviceSlipGenerator() {
           <div className="lg:col-span-3">
             <Card className="overflow-hidden shadow-xl">
               <CardContent className="p-0">
-                {/* Advice Card Preview - Smaller Size */}
+                {/* Advice Card Preview - No lightbulb, no branding */}
                 <div
                   ref={cardRef}
-                  className={`relative w-full bg-gradient-to-br ${selectedBackground.gradient} flex flex-col items-center justify-center p-8 overflow-hidden`}
-                  style={{ aspectRatio: "1/1", height: "400px" }}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "400px",
+                    background: selectedBackground.gradient,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "32px",
+                    overflow: "hidden",
+                  }}
                 >
-                  
                   {/* Decorative Border */}
-                  <div className="absolute inset-3 border-2 border-white/20 rounded-xl"></div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "12px",
+                      left: "12px",
+                      right: "12px",
+                      bottom: "12px",
+                      border: "2px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "12px",
+                    }}
+                  ></div>
 
-                  {/* Quote Icon */}
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                    className="mb-4 -mt-4 z-10"
+                  {/* Quote Icons - Only visible in preview */}
+                  <div className="quote-icons-preview">
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "24px",
+                        left: "24px",
+                        zIndex: 5,
+                      }}
+                    >
+                      <Quote
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          color: "rgba(255, 255, 255, 0.4)",
+                          transform: "rotate(180deg)",
+                        }}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "24px",
+                        right: "24px",
+                        zIndex: 5,
+                      }}
+                    >
+                      <Quote
+                        style={{
+                          width: "32px",
+                          height: "32px",
+                          color: "rgba(255, 255, 255, 0.4)",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Branding - Only visible in downloaded image */}
+                  <div
+                    className="branding-download-only"
+                    style={{
+                      position: "absolute",
+                      bottom: "16px",
+                      right: "16px",
+                      color: "rgba(255, 255, 255, 0.6)",
+                      fontSize: "12px",
+                      zIndex: 10,
+                      display: "none", // Hidden in preview
+                    }}
                   >
-                    <Lightbulb className={`w-12 h-12 ${selectedColor.class} drop-shadow-lg`} />
-                  </motion.div>
+                    Advice Slip Generator
+                  </div>
 
-                  {/* Main Advice Text */}
-                  <motion.div
-                    key={currentAdvice}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center max-w-sm z-10 flex items-center justify-center px-3"
+                  {/* Main Advice Text - Centered without icon */}
+                  <div
+                    style={{
+                      textAlign: "center",
+                      maxWidth: "384px",
+                      zIndex: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 12px",
+                    }}
                   >
                     <p
-                      className={`${selectedFont.class} ${selectedColor.class} font-medium text-center break-words hyphens-auto`}
                       style={{
+                        fontFamily: selectedFont.fontFamily,
+                        color: selectedColor.color,
+                        fontWeight: "700",
+                        textAlign: "center",
+                        wordBreak: "break-word",
+                        hyphens: "auto",
                         textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
-                        fontSize: `${Math.max(textSize * 0.6, 16)}px`, // Smaller preview text
+                        fontSize: `${Math.max(textSize * 0.6, 16)}px`,
                         lineHeight: "1.4",
                         wordSpacing: "0.1em",
                         letterSpacing: "0.02em",
+                        margin: 0,
+                        padding: 0,
                       }}
                     >
-                      &ldquo;{currentAdvice}&rdquo;
+                      {currentAdvice}
                     </p>
-                  </motion.div>
-
-                  {/* Branding */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white/60 text-xs z-10">
-                    Advice Slip Generator
                   </div>
                 </div>
 
@@ -333,11 +568,10 @@ export default function AdviceSlipGenerator() {
                       {isLoading ? (
                         <RefreshCw className="mr-2 w-4 h-4 animate-spin" />
                       ) : (
-                        <Lightbulb className="mr-2 w-4 h-4" />
+                        <RefreshCw className="mr-2 w-4 h-4" />
                       )}
                       {isLoading ? "Getting..." : "Give me advice! 😎"}
                     </Button>
-
                     <div className="flex gap-2">
                       <Button onClick={generateImage} disabled={isGenerating} variant="outline" size="sm">
                         <Download className="mr-1 w-3 h-3" />
@@ -349,40 +583,35 @@ export default function AdviceSlipGenerator() {
                       </Button>
                     </div>
                   </div>
-
                   {/* Size Info - Compact */}
                   <div className="text-center">
                     <p className="text-xs text-gray-600 mb-1">Perfect for Threads & Social Media</p>
-                    <div className={`w-full h-1 rounded-full bg-gradient-to-r ${selectedBackground.gradient}`}></div>
+                    <div className="w-full h-1 rounded-full" style={{ background: selectedBackground.gradient }}></div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Customization Panel - More Compact */}
+          {/* Customization Panel - Reorganized */}
           <div className="lg:col-span-2 space-y-3">
             <Card>
               <CardContent className="p-3">
                 <Tabs defaultValue="backgrounds" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 text-xs h-8">
+                  <TabsList className="grid w-full grid-cols-3 text-xs h-8">
                     <TabsTrigger value="backgrounds" className="text-xs">
                       <Palette className="w-3 h-3" />
                     </TabsTrigger>
                     <TabsTrigger value="fonts" className="text-xs">
-                      <Type className="w-3 h-3" />
+                      <ALargeSmall className="w-3 h-3" />
                     </TabsTrigger>
                     <TabsTrigger value="colors" className="text-xs">
-                      <Heart className="w-3 h-3" />
-                    </TabsTrigger>
-                    <TabsTrigger value="textSize" className="text-xs">
-                      <Settings className="w-3 h-3" />
+                      <Type className="w-3 h-3" />
                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="backgrounds" className="space-y-3 mt-3">
                     <h4 className="font-semibold text-sm">Choose Background</h4>
-
                     {/* Decorative Gradients - With Scrollbar */}
                     <div>
                       <h5 className="text-xs font-medium text-gray-600 mb-2">Decorative Gradients</h5>
@@ -399,7 +628,7 @@ export default function AdviceSlipGenerator() {
                                 : "border-gray-200 hover:border-gray-300"
                             }`}
                           >
-                            <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${bg.gradient}`}></div>
+                            <div className="w-6 h-6 rounded-full" style={{ background: bg.gradient }}></div>
                             <div className="text-left">
                               <div className="font-medium text-xs">{bg.name}</div>
                             </div>
@@ -407,7 +636,6 @@ export default function AdviceSlipGenerator() {
                         ))}
                       </div>
                     </div>
-
                     {/* Solid Colors - With Scrollbar */}
                     <div>
                       <h5 className="text-xs font-medium text-gray-600 mb-2">Solid Colors</h5>
@@ -425,7 +653,7 @@ export default function AdviceSlipGenerator() {
                                   : "border-gray-200 hover:border-gray-300"
                               }`}
                             >
-                              <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${bg.gradient}`}></div>
+                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: bg.gradient }}></div>
                               <div className="text-left">
                                 <div className="font-medium text-xs">{bg.name}</div>
                               </div>
@@ -451,52 +679,61 @@ export default function AdviceSlipGenerator() {
                               : "border-gray-200 hover:border-gray-300"
                           }`}
                         >
-                          <div className={`font-medium text-xs ${font.class}`}>{font.name}</div>
-                          <div className={`text-xs text-gray-600 ${font.class}`}>{font.example}</div>
+                          <div className="font-medium text-xs" style={{ fontFamily: font.fontFamily }}>
+                            {font.name}
+                          </div>
+                          <div className="text-xs text-gray-600" style={{ fontFamily: font.fontFamily }}>
+                            {font.example}
+                          </div>
                         </motion.button>
                       ))}
                     </div>
                   </TabsContent>
 
-                  {/* Text Color */}
-                  <TabsContent value="colors" className="space-y-2 mt-3">
-                    <h4 className="font-semibold text-sm">Text Color</h4>
-                    <div className="grid grid-cols-2 gap-1">
-                      {colorSchemes.map((color) => (
-                        <motion.button
-                          key={color.id}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedColor(color)}
-                          className={`p-2 rounded-lg border-2 transition-all flex items-center gap-2 ${
-                            selectedColor.id === color.id
-                              ? "border-purple-500 bg-purple-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          <div className={`w-3 h-3 rounded-full ${color.bg}`}></div>
-                          <span className="text-xs font-medium">{color.name}</span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </TabsContent>
+                  {/* Text Color & Size Combined */}
+                  <TabsContent value="colors" className="space-y-3 mt-3">
+                    <h4 className="font-semibold text-sm">Text Color & Size</h4>
 
-                  {/* Adjust font size */}
-                  <TabsContent value="textSize" className="space-y-2 mt-3">
-                    <h4 className="font-semibold text-sm">Text Size</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-gray-700">Font Size</span>
-                        <span className="text-xs text-gray-500">{textSize}px</span> {/* show current size */}
+                    {/* Text Colors */}
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">Text Color</h5>
+                      <div className="grid grid-cols-2 gap-1">
+                        {colorSchemes.map((color) => (
+                          <motion.button
+                            key={color.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSelectedColor(color)}
+                            className={`p-2 rounded-lg border-2 transition-all flex items-center gap-2 ${
+                              selectedColor.id === color.id
+                                ? "border-purple-500 bg-purple-50"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color.color }}></div>
+                            <span className="text-xs font-medium">{color.name}</span>
+                          </motion.button>
+                        ))}
                       </div>
-                      <Slider
-                        defaultValue={[32]}
-                        max={48}
-                        min={24}
-                        step={4}
-                        onValueChange={(value: number[]) => setTextSize(value[0])}
-                      />
-                      <p className="text-xs text-gray-500">Adjust text size for perfect fit.</p>
+                    </div>
+
+                    {/* Text Size */}
+                    <div>
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">Text Size</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-medium text-gray-700">Font Size</span>
+                          <span className="text-xs text-gray-500">{textSize}px</span>
+                        </div>
+                        <Slider
+                          defaultValue={[32]}
+                          max={48}
+                          min={24}
+                          step={4}
+                          onValueChange={(value: number[]) => setTextSize(value[0])}
+                        />
+                        <p className="text-xs text-gray-500">Adjust text size for perfect fit.</p>
+                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -543,6 +780,7 @@ export default function AdviceSlipGenerator() {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 }
